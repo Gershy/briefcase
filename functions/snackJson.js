@@ -3,7 +3,8 @@ function snackToJson(name, calories) {
 	dict["Name"] = name;
 	dict["Price"] = calories;
 	var fs = require("fs");
-	fs.writeFile("./object.json", JSON.stringify(sampleObject), (err) => {
+	var filename = "../snackInfo/".concat(name,".json")
+	fs.writeFile(filename, JSON.stringify(dict), (err) => {
     if (err) {
         console.error(err);
         return;
@@ -11,3 +12,6 @@ function snackToJson(name, calories) {
     console.log("Snack Added");
 });
 }
+
+snackToJson("Miss Vickies", 700)
+

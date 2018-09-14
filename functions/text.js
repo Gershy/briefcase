@@ -8,7 +8,7 @@ var sampleObject = {
     }
 };
 
-fs.writeFile("./object.json", JSON.stringify(sampleObject), (err) => {
+fs.writeFile("../snackInfo/object.json", JSON.stringify(sampleObject), (err) => {
     if (err) {
         console.error(err);
         return;

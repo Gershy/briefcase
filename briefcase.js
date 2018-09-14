@@ -10,8 +10,35 @@ let path = require('path');
   
   let server = http.createServer((request, response) => {
     
-    response.writeHead(200, { 'Content-Type': 'text/html' });
-    response.end(clientHtml);
+    console.log(request.method, request.url);
+    
+    let method = request.method.toLowerCase();
+    let url = request.url;
+    
+    let responseFunc = ({
+      
+      'get /': () => {
+        
+        response.writeHead(200, { 'Content-Type': 'text/html' });
+        response.end(clientHtml);
+        
+      },
+      'get /favicon': () => {
+        
+        response.writeHead(404, { 'Content-Type': 'text/plain' });
+        response.end('No favicon yet :(');
+        
+      }
+      
+    })[`${method} ${url}`];
+    
+    if (!responseFunc) {
+      response.writeHead(404, { 'Content-Type': 'text/plain' });
+      response.end(`dunno: ${method} ${url}`);
+      return;
+    }
+    
+    responseFunc();
     
   });
   
@@ -23,7 +50,8 @@ let path = require('path');
     fs.readFile(clientHtmlPath)
   ]);
   
-  server.listen(port, host);
+  console.log('Server ready');
+  
   
 })();
 

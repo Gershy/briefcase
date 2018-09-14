@@ -47,7 +47,41 @@ let path = require('path');
   
   [ serverActive, clientHtml ] = await Promise.all([
     new Promise(r => server.listen(port, host, r)),
-    fs.readFile(clientHtmlPath)
+    (async () => {
+      
+      let [ clientHtml, clientCss, clientJs ] = await Promise.all([
+        fs.readFile(path.join(__dirname, 'client', 'client.html'), 'utf8'),
+        fs.readFile(path.join(__dirname, 'client', 'client.css'), 'utf8'),
+        fs.readFile(path.join(__dirname, 'client', 'client.js'), 'utf8')
+      ]);
+      
+      let replacements = {
+        css: clientCss,
+        js: clientJs
+      };
+      for (const [placeholder, content] of Object.entries(replacements)) {
+        
+        let pcs = clientHtml.split(`{{${placeholder}}}`);
+        
+        let newHtml = [];
+        for (let i = 0; i < pcs.length - 1; i++) {
+          let pc = pcs[i];
+          let ind = pc.length - 1;
+          while (pc[ind] === ' ') ind--;
+          let spaces = ' '.repeat(pc.length - ind);
+          let indented = content.trim().split('\n').map((line, ind) => !ind ? line : spaces + line).join('\n');
+          newHtml.push(pc, indented);
+          
+        }
+        newHtml.push(pcs[pcs.length - 1]);
+        
+        clientHtml = newHtml.join('');
+        
+      }
+      
+      return clientHtml;
+      
+    })()
   ]);
   
   console.log('Server ready');

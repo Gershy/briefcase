@@ -22,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/Gershy/briefcase/issues"
   },
-  "homepage": "https://github.com/Gershy/briefcase#readme"
+  "homepage": "https://github.com/Gershy/briefcase#readme",
+  "dependencies": {
+    "fs-extra": "^7.0.0"
+  }
 }

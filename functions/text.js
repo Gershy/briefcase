@@ -1,17 +1,19 @@
-var fs = require("fs");
+let fs = require('fs-extra');
+let path = require('path');
+
 var sampleObject = {
-    a: 1,
-    b: 2,
-    c: {
-        x: 11,
-        y: 22
-    }
+  a: 1,
+  b: 2,
+  c: {
+    x: 11,
+    y: 22
+  }
 };
 
-fs.writeFile("../snackInfo/object.json", JSON.stringify(sampleObject), (err) => {
-    if (err) {
-        console.error(err);
-        return;
-    };
-    console.log("File has been created");
-});
+(async () => {
+  
+  let saveFilePath = path.join(__dirname, '..', 'snackInfo', 'object.json');
+  await fs.writeFile(saveFilePath, JSON.stringify(sampleObject));
+  console.log('Saved!');
+  
+})();

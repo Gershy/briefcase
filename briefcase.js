@@ -8,7 +8,7 @@ let path = require('path');
   let serverActive = null;
   let clientHtml = null;
   
-  let server = http.createServer((request, response) => {
+  let server = http.createServer(async (request, response) => {
     
     console.log(request.method, request.url);
     
@@ -17,13 +17,13 @@ let path = require('path');
     
     let responseFunc = ({
       
-      'get /': () => {
+      'get /': async () => {
         
         response.writeHead(200, { 'Content-Type': 'text/html' });
         response.end(clientHtml);
         
       },
-      'get /favicon': () => {
+      'get /favicon': async () => {
         
         response.writeHead(404, { 'Content-Type': 'text/plain' });
         response.end('No favicon yet :(');
@@ -35,10 +35,12 @@ let path = require('path');
     if (!responseFunc) {
       response.writeHead(404, { 'Content-Type': 'text/plain' });
       response.end(`dunno: ${method} ${url}`);
+      console.log(`error: ${method} ${url}`);
       return;
     }
     
-    responseFunc();
+    await responseFunc();
+    console.log(`served: ${method} ${url}`);
     
   });
   

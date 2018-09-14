@@ -38,15 +38,18 @@ window.onload = async () => {
   let shelf = body.appendChild(document.createElement('div'));
   shelf.classList.add('shelf');
   
-  for (const [ snackId, snackData ] of Object.entries(snackDef)) {
+  let snacks = shelf.appendChild(document.createElement('div'));
+  snacks.classList.add('snacks');
+  
+  let snackEntries = Object.entries(snackDef);
+  for (const [ snackId, snackData ] of snackEntries) {
     
-    let snack = shelf.appendChild(document.createElement('div'));
+    let snack = snacks.appendChild(document.createElement('div'));
     snack.classList.add('snack');
     snack.classList.add(`snack-${snackId}`);
     
-    let snackTitle = snack.appendChild(document.createElement('div'));
-    snackTitle.classList.add('title');
-    snackTitle.innerContent = snackData.displayName;
+    let snackDisplay = snack.appendChild(document.createElement('div'));
+    snackDisplay.classList.add('display');
     
   }
   

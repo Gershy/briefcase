@@ -15,32 +15,59 @@ let path = require('path');
     let method = request.method.toLowerCase();
     let url = request.url;
     
-    let responseFunc = ({
+    try {
       
-      'get /': async () => {
+      if (method === 'get' && url === '/') {
         
         response.writeHead(200, { 'Content-Type': 'text/html' });
         response.end(clientHtml);
         
-      },
-      'get /favicon': async () => {
+      } else if (method === 'get' && url === '/favicon') {
         
         response.writeHead(404, { 'Content-Type': 'text/plain' });
         response.end('No favicon yet :(');
         
+      } else if (method === 'get' && url.startsWith('/assets')) {
+        
+        let pcs = url.split('/');
+        let lastPc = pcs[pcs.length - 1];
+        
+        console.log('LAST:', lastPc);
+        
+        if (!~lastPc.indexOf('.')) throw new Error(`Bad url: ${url}`);
+        
+        lastPc = lastPc.split('.');
+        let ext = lastPc[lastPc.length - 1];
+        
+        let contentType = ({
+          png: 'image/png',
+          jpg: 'image/jpg',
+          jpeg: 'image/jpg'
+        })[ext];
+        
+        if (!contentType) throw new Error(`Bad asset extension: ${ext}`);
+        
+        response.writeHead(200, { 'Content-Type': contentType });
+        
+        let filepath = path.join(__dirname, ...pcs);
+        fs.createReadStream(filepath).pipe(response);
+        
+      } else {
+        
+        throw new Error('bad request');
+        
       }
       
-    })[`${method} ${url}`];
-    
-    if (!responseFunc) {
+      console.log(`served: ${method} ${url}`);
+      
+    } catch(err) {
+      
       response.writeHead(404, { 'Content-Type': 'text/plain' });
       response.end(`dunno: ${method} ${url}`);
-      console.log(`error: ${method} ${url}`);
+      console.log(`error: ${method} ${url} (${err.message})`);
       return;
+      
     }
-    
-    await responseFunc();
-    console.log(`served: ${method} ${url}`);
     
   });
   

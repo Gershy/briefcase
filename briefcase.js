@@ -29,8 +29,6 @@ let data = {
     }
   },
   inserted: [
-    'sweetChilliHeat',
-    'gumz'
   ]
 };
 

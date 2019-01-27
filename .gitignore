@@ -59,3 +59,8 @@ typings/
 
 # next.js build output
 .next
+
+# Things daniel said to add
+.DS_Store
+.trashes
+thumbs.db

@@ -2,6 +2,16 @@ let http = require('http');
 let fs = require('fs-extra');
 let path = require('path');
 
+console.log(process.argv.slice(2).join('~').split('--'));
+
+let args = process.argv.slice(2).join('~').trim().split('--').reduce((obj, v) => {
+  if (v) { let [ k, ...vs ] = v.split('~'); obj[k] = vs.join('~'); }
+  return obj;
+}, {});
+
+if (!args.hasOwnProperty('host')) throw new Error('Missing "host" param');
+if (!args.hasOwnProperty('port')) throw new Error('Missing "port" param');
+
 (async () => {
 
   let clientHtmlPath = path.join(__dirname, 'client.html');
@@ -69,11 +79,8 @@ let path = require('path');
 
   });
 
-  let port = process.env.PORT || 80;
-  let host = 'localhost';
-
   [ serverActive, clientHtml ] = await Promise.all([
-    new Promise(r => server.listen(port, host, r)),
+    new Promise(r => server.listen(args.port, args.host, r)),
     (async () => {
 
       let [ clientHtml, clientCss, clientJs ] = await Promise.all([

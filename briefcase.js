@@ -10,6 +10,30 @@ let args = process.argv.slice(2).join('~').trim().split('--').reduce((obj, v) =>
 if (!args.hasOwnProperty('host')) throw new Error('Missing "host" param');
 if (!args.hasOwnProperty('port')) throw new Error('Missing "port" param');
 
+let data = {
+  available: {
+    sweetChilliHeat: {
+      name: 'Sweet Chilli Heat',
+      price: 4.5,
+      imageUrl: 'assets/img/sch.png'
+    },
+    missVickiesJalapeno: {
+      name: 'Jalapeno',
+      price: 4.5,
+      imageUrl: 'assets/img/mvj.png'
+    },
+    gumz: {
+      name: 'Wine Gums',
+      price: 3,
+      imageUrl: 'assets/img/gums.png'
+    }
+  },
+  inserted: [
+    'sweetChilliHeat',
+    'gumz'
+  ]
+};
+
 (async () => {
 
   let clientHtmlPath = path.join(__dirname, 'client.html');
@@ -22,14 +46,48 @@ if (!args.hasOwnProperty('port')) throw new Error('Missing "port" param');
 
     let method = request.method.toLowerCase();
     let url = request.url;
+    
+    let getBody = async req => {
+      let chunks = [];
+      req.on('data', chunk => chunks.push(chunk));
+      let body = await new Promise(r => req.on('end', r));
+      return JSON.parse(chunks.join(''));
+    };
 
     try {
 
       if (method === 'get' && url === '/') {
 
         response.writeHead(200, { 'Content-Type': 'text/html' });
-        response.end(clientHtml);
+        let filepath = path.join(__dirname, 'simple.html');
+        fs.createReadStream(filepath).pipe(response);
+        //response.end(clientHtml);
 
+      } else if (method === 'get' && url.startsWith('/updateData')) {
+        
+        response.writeHead(200, { 'Content-Type': 'text/javascript' });
+        response.end(JSON.stringify({
+          available: data.available,
+          inserted: { add: data.inserted }
+        }));
+        
+      } else if (method === 'get' && url.startsWith('/addInserted')) {
+        
+        //let { snackId } = await getBody(request);
+        let snackId = url.substr(('/addInserted?').length);
+        data.inserted.push(snackId);
+        response.writeHead(200, { 'Content-Type': 'text/plain' });
+        response.end('ok!');
+        
+      } else if (method === 'get' && url.startsWith('/remInserted')) {
+        
+        //let { snackId } = await getBody(request);
+        let snackId = url.substr(('/remInserted?').length);
+        let ind = data.inserted.findIndex(v => v === snackId);
+        data.inserted.splice(ind, 1);
+        response.writeHead(200, { 'Content-Type': 'text/plain' });
+        response.end('ok!');
+        
       } else if (method === 'get' && url === '/favicon') {
 
         response.writeHead(404, { 'Content-Type': 'text/plain' });

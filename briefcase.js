@@ -32,8 +32,6 @@ let path = require('path');
         let pcs = url.split('/');
         let lastPc = pcs[pcs.length - 1];
 
-        console.log('LAST:', lastPc);
-
         if (!~lastPc.indexOf('.')) throw new Error(`Bad url: ${url}`);
 
         lastPc = lastPc.split('.');
@@ -114,6 +112,5 @@ let path = require('path');
   ]);
 
   console.log('Server ready');
-
 
 })();

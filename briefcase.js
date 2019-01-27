@@ -2,10 +2,8 @@ let http = require('http');
 let fs = require('fs-extra');
 let path = require('path');
 
-console.log(process.argv.slice(2).join('~').split('--'));
-
 let args = process.argv.slice(2).join('~').trim().split('--').reduce((obj, v) => {
-  if (v) { let [ k, ...vs ] = v.split('~'); obj[k] = vs.join('~'); }
+  if (v) { let [ k, ...vs ] = v.trim().split('~'); obj[k] = vs.filter(v => !!v).join('~'); }
   return obj;
 }, {});
 

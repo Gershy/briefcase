@@ -22,155 +22,114 @@ let data = {
       price: 4.5,
       imageUrl: 'assets/img/mvj.png'
     },
+    peech: {
+      name: 'Fuzzy Peaches',
+      price: 3,
+      imageUrl: 'assets/img/peech.png'
+    },
     gumz: {
       name: 'Wine Gums',
       price: 3,
       imageUrl: 'assets/img/gums.png'
+    },
+    cornChips: {
+      name: 'Corn Chips',
+      price: 3,
+      imageUrl: 'assets/img/cornChip.png'
+    },
+    creamyDip: {
+      name: 'Creamy Dip',
+      price: 5,
+      imageUrl: 'assets/img/creamyDip.png'
+    },
+    salsa: {
+      name: 'Salsa',
+      price: 5,
+      imageUrl: 'assets/img/salsa.png'
     }
   },
-  inserted: [
-  ]
+  inserted: {}
 };
 
 (async () => {
 
-  let clientHtmlPath = path.join(__dirname, 'client.html');
-  let serverActive = null;
-  let clientHtml = null;
+  let router = {
+    'get /': async (req, res) => {
+      res.writeHead(200, { 'Content-Type': 'text/html' });
+      fs.createReadStream(path.join(__dirname, 'simple.html')).pipe(res);
+    },
+    'get /favicon': async (req, res) => {
+      res.writeHead(404, { 'Content-Type': 'text/plain' });
+      res.end('No favicon yet :(');
+    },
+    'get /assets': async (req, res) => {
+      let pcs = req.url.split('/');
+      if (pcs[pcs.length - 1].indexOf('.') === -1) throw new Error(`Invalid path: ${req.url}`);
 
+      lastPc = pcs[pcs.length - 1].split('.');
+      let ext = lastPc[lastPc.length - 1];
+
+      let contentTypes = ({
+        png: 'image/png',
+        jpg: 'image/jpg',
+        jpeg: 'image/jpg'
+      });
+      if (!contentTypes.hasOwnProperty(ext)) throw new Error(`Invalid path: ${req.url}`);
+
+      res.writeHead(200, { 'Content-Type': contentTypes[ext] });
+      fs.createReadStream(path.join(__dirname, ...pcs)).pipe(res); // TODO: Vulnerability if `pcs` contains ".."
+    },
+    'get /updateData': async (req, res) => {
+      res.writeHead(200, { 'Content-Type': 'text/javascript' });
+      res.end(JSON.stringify(data));
+    },
+    'get /addInserted': async (req, res) => {
+      let snackId = req.url.substr(('/addInserted?').length);
+      if (!data.available.hasOwnProperty(snackId)) throw new Error(`Invalid snackId: ${snackId}`);
+      
+      if (!data.inserted.hasOwnProperty(snackId)) data.inserted[snackId] = 0;
+      data.inserted[snackId]++;
+      
+      res.writeHead(200, { 'Content-Type': 'text/javascript' });
+      res.end(JSON.stringify(data));
+    },
+    'get /remInserted': async (req, res) => {
+      let snackId = req.url.substr(('/remInserted?').length);
+      if (!data.available.hasOwnProperty(snackId)) throw new Error(`Invalid snackId: ${snackId}`);
+      if (!data.inserted.hasOwnProperty(snackId)) throw new Error(`No "${snackId}" snacks inserted`);
+      
+      data.inserted[snackId]--;
+      if (!data.inserted[snackId]) delete data.inserted[snackId];
+      
+      res.writeHead(200, { 'Content-Type': 'text/javascript' });
+      res.end(JSON.stringify(data));
+    }
+  };
+  
   let server = http.createServer(async (request, response) => {
-
-    console.log(request.method, request.url);
 
     let method = request.method.toLowerCase();
     let url = request.url;
     
-    let getBody = async req => {
-      let chunks = [];
-      req.on('data', chunk => chunks.push(chunk));
-      let body = await new Promise(r => req.on('end', r));
-      return JSON.parse(chunks.join(''));
-    };
-
-    try {
-
-      if (method === 'get' && url === '/') {
-
-        response.writeHead(200, { 'Content-Type': 'text/html' });
-        let filepath = path.join(__dirname, 'simple.html');
-        fs.createReadStream(filepath).pipe(response);
-        //response.end(clientHtml);
-
-      } else if (method === 'get' && url.startsWith('/updateData')) {
-        
-        response.writeHead(200, { 'Content-Type': 'text/javascript' });
-        response.end(JSON.stringify({
-          available: data.available,
-          inserted: { add: data.inserted }
-        }));
-        
-      } else if (method === 'get' && url.startsWith('/addInserted')) {
-        
-        //let { snackId } = await getBody(request);
-        let snackId = url.substr(('/addInserted?').length);
-        data.inserted.push(snackId);
-        response.writeHead(200, { 'Content-Type': 'text/plain' });
-        response.end('ok!');
-        
-      } else if (method === 'get' && url.startsWith('/remInserted')) {
-        
-        //let { snackId } = await getBody(request);
-        let snackId = url.substr(('/remInserted?').length);
-        let ind = data.inserted.findIndex(v => v === snackId);
-        data.inserted.splice(ind, 1);
-        response.writeHead(200, { 'Content-Type': 'text/plain' });
-        response.end('ok!');
-        
-      } else if (method === 'get' && url === '/favicon') {
-
-        response.writeHead(404, { 'Content-Type': 'text/plain' });
-        response.end('No favicon yet :(');
-
-      } else if (method === 'get' && url.startsWith('/assets')) {
-
-        let pcs = url.split('/');
-        let lastPc = pcs[pcs.length - 1];
-
-        if (!~lastPc.indexOf('.')) throw new Error(`Bad url: ${url}`);
-
-        lastPc = lastPc.split('.');
-        let ext = lastPc[lastPc.length - 1];
-
-        let contentType = ({
-          png: 'image/png',
-          jpg: 'image/jpg',
-          jpeg: 'image/jpg'
-        })[ext];
-
-        if (!contentType) throw new Error(`Bad asset extension: ${ext}`);
-
-        response.writeHead(200, { 'Content-Type': contentType });
-
-        let filepath = path.join(__dirname, ...pcs);
-        fs.createReadStream(filepath).pipe(response);
-
-      } else {
-
-        throw new Error('bad request');
-
-      }
-
-      console.log(`served: ${method} ${url}`);
-
-    } catch(err) {
-
-      response.writeHead(404, { 'Content-Type': 'text/plain' });
-      response.end(`dunno: ${method} ${url}`);
-      console.log(`error: ${method} ${url} (${err.message})`);
-      return;
-
+    let match = (request.url.match(/^\/[^/?]*/) || [ '/' ])[0];
+    let routerStr = `${request.method.toLowerCase()} ${match}`;
+    
+    console.log(`serving: ${routerStr} (${url})`);
+    
+    if (!router.hasOwnProperty(routerStr)) {
+      response.writeHead(400, { 'Content-Type': 'text/plain' });
+      return response.end(`Invalid endpoint: ${request.method} ${request.url}`);
+    }
+    
+    try { await router[routerStr](request, response); } catch(err) {
+      console.log('Error in router:', err.stack);
+      response.writeHead(400, { 'Content-Type': 'text/plain' });
+      return response.end(`Invalid request: ${request.method} ${request.url} -> ${err.message}`);
     }
 
   });
-
-  [ serverActive, clientHtml ] = await Promise.all([
-    new Promise(r => server.listen(args.port, args.host, r)),
-    (async () => {
-
-      let [ clientHtml, clientCss, clientJs ] = await Promise.all([
-        fs.readFile(path.join(__dirname, 'client', 'client.html'), 'utf8'),
-        fs.readFile(path.join(__dirname, 'client', 'client.css'), 'utf8'),
-        fs.readFile(path.join(__dirname, 'client', 'client.js'), 'utf8')
-      ]);
-
-      let replacements = {
-        css: clientCss,
-        js: clientJs
-      };
-      for (const [placeholder, content] of Object.entries(replacements)) {
-
-        let pcs = clientHtml.split(`{{${placeholder}}}`);
-
-        let newHtml = [];
-        for (let i = 0; i < pcs.length - 1; i++) {
-          let pc = pcs[i];
-          let ind = pc.length - 1;
-          while (pc[ind] === ' ') ind--;
-          let spaces = ' '.repeat(pc.length - ind);
-          let indented = content.trim().split('\n').map((line, ind) => !ind ? line : spaces + line).join('\n');
-          newHtml.push(pc, indented);
-
-        }
-        newHtml.push(pcs[pcs.length - 1]);
-
-        clientHtml = newHtml.join('');
-
-      }
-
-      return clientHtml;
-
-    })()
-  ]);
+  
+  await new Promise(r => server.listen(args.port, args.host, r));
 
   console.log('Server ready');
 

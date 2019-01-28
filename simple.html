@@ -3,6 +3,16 @@
   <head>
     <title>Briefcase!!</title>
     <style rel="stylesheet" type="text/css">
+      
+      @keyframes wobbly {
+        10% { transform: rotate(4deg); }
+        30% { transform: rotate(-4deg); }
+        60% { transform: rotate(6deg); }
+        70% { transform: rotate(-3deg); }
+        85% { transform: rotate(3deg); }
+        100% { transform: rotate(-6deg); }
+      }
+      
       html, body {
         position: fixed;
         left: 0; top: 0;
@@ -47,12 +57,23 @@
         box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.4);
         overflow: hidden;
         white-space: nowrap;
+        transition: opacity 1000ms ease-out;
+        opacity: 1;
       }
       .snack > .text {
         position: absolute;
         width: 100%; height: 30px; line-height: 30px;
         color: #ffffff;
         z-index: 2;
+      }
+      .snack.waiting {
+        opacity: 0.7;
+        pointer-events: none;
+        animation-name: wobbly;
+        animation-iteration-count: infinite;
+        animation-delay: 1000ms;
+        animation-timing-function: ease-in-out;
+        animation-duration: 400ms;
       }
       .snack:before {
         content: ''; display: block; position: absolute;
@@ -107,68 +128,86 @@
         }
         */
         
-        while (availableDom.firstChild) availableDom.removeChild(availableDom.firstChild);
-        available = upd;
+        // Remove snacks no longer available
         for (let [ snackId, snackData ] of Object.entries(available)) {
-          console.log(snackId, snackData);
-          let snackDom = availableDom.appendChild(div('snack'));
-          snackDom.classList.add(snackId);
-          let snackTextDom = snackDom.appendChild(div('text'));
-          snackTextDom.innerText = snackData.name;
-          
-          snackDom.addEventListener('mousedown', async () => {
-            await poll(`addInserted?${snackId}`); // Do the add
-            await update();                     // See server confirmation
-          });
-        }
-      };
-      
-      let insId = 0;
-      let inserted = [];
-      let updateInserted = ({ add=[], rem=[] }) => {
-        
-        for (let snackId of add) {
-          // Create data
-          let insertData = { snackId, id: insId++ };
-          inserted.push(insertData);
-          
-          // Create dom
-          let snackData = available[snackId];
-          let snackDom = insertedDom.appendChild(div('snack'));
-          snackDom.classList.add(snackId);
-          let snackTextDom = snackDom.appendChild(div('text'));
-          snackTextDom.innerText = snackData.name;
-          
-          snackDom.snackData = snackData;
-          //snackDom.style.backgroundImage = `url("${snackData.imageUrl}")`;
-          snackDom.addEventListener('mousedown', async () => {
-            await poll(`remInserted?${snackId}`); // Do the removal
-            await update();                     // See that server confirmed
-            //updateInserted({ rem: [ snackId ] });
-          });
-          
-          insertData.snackDom = snackDom;
+          if (!upd.hasOwnProperty(snackId)) {
+            available[snackId].snackDom.parentNode.removeChild(available[snackId].snackDom);
+            delete available[snackId];
+          }
         }
         
-        for (let snackId of rem) {
-          let ind = inserted.findIndex(snackData => snackData.snackId === snackId);
-          if (ind === -1) continue;
-          let snackData = inserted[ind];
+        for (let [ snackId, snackData ] of Object.entries(upd)) {
           
-          // Remove data
-          inserted.splice(ind, 1);
+          // Initial setup
+          if (!available.hasOwnProperty(snackId)) {
+            let snackDom = availableDom.appendChild(div('snack'));
+            snackDom.classList.add(snackId);
+            snackDom.snackId = snackId;
+            let snackTextDom = snackDom.appendChild(div('text'));
+            
+            snackDom.addEventListener('mousedown', async () => {
+              snackDom.classList.add('waiting');
+              let upd = await poll(`addInserted?${snackDom.snackId}`); // Do the add
+              await update(upd);
+              snackDom.classList.remove('waiting');
+            });
+            available[snackId] = { snackData, snackDom };
+          }
           
-          // Remove dom
-          insertedDom.removeChild(snackData.snackDom);
+          available[snackId].snackData = snackData;
+          available[snackId].snackDom.getElementsByClassName('text')[0].innerText = snackData.name;
         }
         
       };
       
-      let update = async () => {
-        inserted.forEach(ins => { ins.snackDom.parentNode.removeChild(ins.snackDom); });
-        inserted = [];
+      let inserted = {};
+      let updateInserted = (snackCounts) => {
         
-        let data = await poll('updateData')
+        // Remove any snacks that have dropped to 0
+        for (let [ snackId, snackIns ] of Object.entries(inserted)) {
+          if (!snackCounts.hasOwnProperty(snackId)) {
+            snackIns.snackDom.parentNode.removeChild(snackIns.snackDom);
+            delete inserted[snackId];
+          }
+        }
+        
+        for (let [ snackId, count ] of Object.entries(snackCounts)) {
+          
+          // Get data
+          let snackData = available[snackId].snackData;
+          
+          // Initial setup
+          if (!inserted.hasOwnProperty(snackId)) {
+            
+            // Create dom
+            let snackDom = insertedDom.appendChild(div('snack'));
+            snackDom.classList.add(snackId);
+            let snackTextDom = snackDom.appendChild(div('text'));
+            snackDom.snackId = snackId;
+            snackDom.addEventListener('mousedown', async () => {
+              snackDom.classList.add('waiting');
+              let upd = await poll(`remInserted?${snackDom.snackId}`); // Do the removal
+              await update(upd);
+              snackDom.classList.remove('waiting');
+            });
+            
+            inserted[snackId] = { snackData, snackDom, count: 0 };
+            
+          }
+          
+          // Update count and dom
+          inserted[snackId].count = count;
+          inserted[snackId].snackDom.getElementsByClassName('text')[0].innerText = `${snackData.name} (x ${count})`;
+          
+        }
+        
+      };
+      
+      let updateTimeout = null;
+      let update = async (data) => {
+        clearTimeout(updateTimeout);
+        updateTimeout = setTimeout(update, 2000);
+        if (!data) data = await poll('updateData');
         updateAvailable(data.available);
         updateInserted(data.inserted);
         return data;
@@ -179,9 +218,6 @@
       
       await update();
       snackControl.removeChild(loading);
-      setInterval(update, 10000);
-      
-      
       
     })();</script>
   </head>

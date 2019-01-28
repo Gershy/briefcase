@@ -7,8 +7,8 @@ let args = process.argv.slice(2).join('~').trim().split('--').reduce((obj, v) =>
   return obj;
 }, {});
 
-if (!args.hasOwnProperty('host')) throw new Error('Missing "host" param');
-if (!args.hasOwnProperty('port')) throw new Error('Missing "port" param');
+if (!args.hasOwnProperty('host')) args.host === 'localhost'; // throw new Error('Missing "host" param');
+if (!args.hasOwnProperty('port')) args.port === '80'; // throw new Error('Missing "port" param');
 
 let data = {
   available: {

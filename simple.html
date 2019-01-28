@@ -20,6 +20,7 @@
         margin: 0; padding: 0;
         background-color: #a8a8a8;
         font-family: sans-serif;
+        user-select: none;
       }
       .snackControl {
         position: absolute;
@@ -28,7 +29,7 @@
         margin-left: -200px; margin-top: -200px;
         box-shadow: 0 0 0 10px #000000;
         background-color: #ffffff;
-        user-select: none;
+        z-index: 1;
       }
       .snackControl > .loading {
         position: absolute;
@@ -89,6 +90,54 @@
       .snack:hover:before { left: 150px; }
       .available > .snack:before { background-color: #00a010; box-shadow: 0 0 20px 2px #00a010; }
       .inserted > .snack:before { background-color: #c00000; box-shadow: 0 0 20px 2px #c00000; }
+      
+      .adminButton {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        width: 4px; height: 4px;
+        background-color: #ffffff;
+      }
+      .admin {
+        position: absolute;
+        left: 100%; top: 100%;
+        width: 480px; height: 480px;
+        padding: 10px;
+        margin-left: -250px; margin-top: -250px;
+        transform: scale(0);
+        background-color: rgba(255, 255, 255, 0.8);
+        box-shadow: 0 0 0 14px #000000;
+        pointer-events: none;
+        z-index: 2;
+        text-align: center;
+        
+        transition: left 600ms ease-in-out, top 600ms ease-in-out, transform 600ms linear;
+      }
+      .admin.open {
+        left: 50%; top: 50%;
+        transform: scale(1);
+        pointer-events: all;
+        font-size: 0;
+      }
+      .admin > .availableContent {
+        width: 472px; height: 400px;
+        padding: 4px;
+        resize: none;
+        outline: none !important;
+        border: none !important;
+        background-color: rgba(255, 255, 255, 0.8);
+        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.8);
+        font-size: 14px;
+      }
+      .admin > .button {
+        position: relative;
+        width: 200px; height: 60px; line-height: 60px;
+        font-size: 30px;
+        margin: 10px auto 0;
+        background-color: #102070;
+        color: #ffffff;
+        cursor: pointer;
+      }
     </style>
     <script type="text/javascript">(async () => {
       let poll = async (cmd, params=null) => {
@@ -115,6 +164,35 @@
       let snackControl = body.appendChild(div('snackControl'));
       let availableDom = snackControl.appendChild(div('available'));
       let insertedDom = snackControl.appendChild(div('inserted'));
+      
+      let adminOpen = false;
+      let adminDom = body.appendChild(div('admin'));
+      let adminAvailableContent = adminDom.appendChild(document.createElement('textarea'));
+      adminAvailableContent.classList.add('availableContent');
+      
+      let adminUpdateButtonDom = adminDom.appendChild(div('button'))
+      adminUpdateButtonDom.innerText = 'Update!';
+      adminUpdateButtonDom.addEventListener('mousedown', async () => {
+        try {
+          let parsedAvail = JSON.parse(adminAvailableContent.value);
+          let result = await poll(`setAvailable?${encodeURIComponent(JSON.stringify(parsedAvail))}`);
+          alert(result);
+        } catch(err) {
+          alert('bad!');
+        }
+      });
+      
+      let adminButtonDom = body.appendChild(div('adminButton'));
+      adminButtonDom.addEventListener('mousedown', () => {
+        adminDom.classList[adminOpen ? 'remove' : 'add']('open');
+        adminOpen = !adminOpen;
+        
+        if (adminOpen) {
+          let curAvail = {};
+          for (let k in available) curAvail[k] = available[k].snackData;
+          adminAvailableContent.value = JSON.stringify(curAvail, null, 2);
+        }
+      });
       
       let available = {};
       let updateAvailable = upd => {

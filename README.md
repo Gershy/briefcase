@@ -5,12 +5,15 @@ The future of snacks is now.
 ## Instructions
 To run the server:
 ```
-$ node briefcase.js
+$ node briefcase.js --host <"localhost"|ip> --port <port #>
 ```
 
-This will start the app on port 80. If you want to run it on another port, for example 3456, run:
+For local testing use:
 ```
-$ PORT=3456 node briefcase.js
+$ node briefcase.js --host localhost --port 80
 ```
 
-to set the env variables.
+Server-side use:
+```
+$ node briefcase.js --host 5.4.3.2 --port 80
+```

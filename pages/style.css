@@ -7,10 +7,9 @@ html, body {
 
 body {
     background-color: #BEDEFF;
-    padding: 8px;
 }
 
-ul {
+ul.nav_bar {
   list-style-type: none;
   margin-top: 8px;
   padding-top: 16px;
@@ -20,15 +19,30 @@ ul {
   font-size: 0px;
 }
 
-div.section {
-  font-size: 24px;
-}
-
 li {
   display: inline; 
   color: #000000;
   size: 14px 16px;
 }
+
+
+div.main {
+  margin-left: 8px;
+}
+
+div.section {
+  font-size: 36px;
+}
+
+ul.profiles {
+  
+}
+
+img.profile_picture {
+  height: 200px;
+  width: 200px;
+}
+
 
 a.nav_button {
   color: #000000;

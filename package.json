@@ -3,27 +3,17 @@
   "version": "1.0.0",
   "description": "WHAT IS INSIDE THAT BRIEFCASE??",
   "main": "briefcase.js",
-  "scripts": {
-    "test": "test"
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Gershy/briefcase.git"
   },
-  "keywords": [
-    "briefcase",
-    "what",
-    "is",
-    "in",
-    "it"
-  ],
+  "keywords": [ "briefcase", "what", "is", "in", "there", "dude" ],
   "author": "friday :D",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/Gershy/briefcase/issues"
   },
   "homepage": "https://github.com/Gershy/briefcase#readme",
-  "dependencies": {
-    "fs-extra": "^7.0.0"
-  }
+  "dependencies": {}
 }

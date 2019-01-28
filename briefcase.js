@@ -1,6 +1,4 @@
-let http = require('http');
-let fs = require('fs-extra');
-let path = require('path');
+let [ http, fs, path ] = [ 'http', 'fs', 'path' ].map(require);
 
 let args = {
   host: 'localhost',
@@ -17,51 +15,19 @@ let data = null;
 try {
   data = JSON.parse(fs.readFileSync(statePath));
 } catch(err) {
+  console.log('Couldn\'t read saved state (created new state)');
   data = {
     available: {
-      sweetChilliHeat: {
-        name: 'Sweet Chilli Heat',
-        price: 4.5,
-        imageUrl: 'assets/img/sch.png'
-      },
-      missVickiesJalapeno: {
-        name: 'Jalapeno',
-        price: 4.5,
-        imageUrl: 'assets/img/mvj.png'
-      },
-      peech: {
-        name: 'Fuzzy Peaches',
-        price: 3,
-        imageUrl: 'assets/img/peech.png'
-      },
-      gumz: {
-        name: 'Wine Gums',
-        price: 3,
-        imageUrl: 'assets/img/gums.png'
-      },
-      cornChips: {
-        name: 'Corn Chips',
-        price: 3,
-        imageUrl: 'assets/img/cornChip.png'
-      },
-      creamyDip: {
-        name: 'Creamy Dip',
-        price: 5,
-        imageUrl: 'assets/img/creamyDip.png'
-      },
-      salsa: {
-        name: 'Salsa',
-        price: 5,
-        imageUrl: 'assets/img/salsa.png'
-      }
+      thing1: { name: 'Thing1', price: 1, imageUrl: 'assets/img/thing1.png' },
+      thing2: { name: 'Thing2', price: 2, imageUrl: 'assets/img/thing2.png' },
+      thing3: { name: 'Thing3', price: 3, imageUrl: 'assets/img/thing3.png' }
     },
     inserted: {}
   };
 };
 
-setInterval(async () => {
-  await fs.writeFile(statePath, JSON.stringify(data));
-}, 2000);
+// Save to disk every so often
+setInterval(() => fs.writeFile(statePath, JSON.stringify(data), ()=>{}), 10000);
 
 let router = {
   'get /': async (req, res) => {
@@ -115,40 +81,37 @@ let router = {
     res.end(JSON.stringify(data));
   },
   'get /setAvailable': async(req, res) => {
+    // The whole JSON string is being sent in the URL, yuck
     let newAvailable = JSON.parse(decodeURIComponent(req.url.substr(('/setAvailable?').length)));
-    
-    // Update all available snacks
     data.available = newAvailable;
     
     // Remove inserted snacks which no longer exist
-    for (let snackId in data.inserted) {
-      if (!data.available.hasOwnProperty(snackId)) delete data.inserted[snackId];
-    }
+    for (let snackId in data.inserted) if (!data.available.hasOwnProperty(snackId)) delete data.inserted[snackId];
     
     res.writeHead(200, { 'Content-Type': 'text/javascript' });
     res.end(JSON.stringify(data));
   }
 };
 
-let server = http.createServer(async (request, response) => {
+let server = http.createServer(async (req, res) => {
 
-  let method = request.method.toLowerCase();
-  let url = request.url;
+  let method = req.method.toLowerCase();
+  let url = req.url;
   
-  let match = (request.url.match(/^\/[^/?]*/) || [ '/' ])[0];
-  let routerStr = `${request.method.toLowerCase()} ${match}`;
+  let match = (req.url.match(/^\/[^/?]*/) || [ '/' ])[0];
+  let routerStr = `${req.method.toLowerCase()} ${match}`;
   
-  console.log(`serving: ${routerStr} (${url})`);
+  console.log(`serving: ${req.connection.remoteAddress} -> ${routerStr} (${url})`);
   
   if (!router.hasOwnProperty(routerStr)) {
-    response.writeHead(400, { 'Content-Type': 'text/plain' });
-    return response.end(`Invalid endpoint: ${request.method} ${request.url}`);
+    res.writeHead(400, { 'Content-Type': 'text/plain' });
+    return res.end(`Invalid endpoint: ${req.method} ${req.url}`);
   }
   
-  try { await router[routerStr](request, response); } catch(err) {
+  try { await router[routerStr](req, res); } catch(err) {
     console.log('Error in router:', err.stack);
-    response.writeHead(400, { 'Content-Type': 'text/plain' });
-    return response.end(`Invalid request: ${request.method} ${request.url} -> ${err.message}`);
+    res.writeHead(400, { 'Content-Type': 'text/plain' });
+    return res.end(`Invalid req: ${req.method} ${req.url} -> ${err.message}`);
   }
 
 });

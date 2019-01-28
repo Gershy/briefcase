@@ -175,8 +175,10 @@
       adminUpdateButtonDom.addEventListener('mousedown', async () => {
         try {
           let parsedAvail = JSON.parse(adminAvailableContent.value);
-          let result = await poll(`setAvailable?${encodeURIComponent(JSON.stringify(parsedAvail))}`);
-          alert(result);
+          let upd = await poll(`setAvailable?${encodeURIComponent(JSON.stringify(parsedAvail))}`);
+          await update(upd);
+          adminOpen = false;
+          adminDom.classList.remove('open');
         } catch(err) {
           alert('bad!');
         }

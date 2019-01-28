@@ -124,6 +124,9 @@ let router = {
     for (let snackId in data.inserted) {
       if (!data.available.hasOwnProperty(snackId)) delete data.inserted[snackId];
     }
+    
+    res.writeHead(200, { 'Content-Type': 'text/javascript' });
+    res.end(JSON.stringify(data));
   }
 };
 

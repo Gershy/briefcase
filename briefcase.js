@@ -18,9 +18,9 @@ try {
   console.log('Couldn\'t read saved state (created new state)');
   data = {
     available: {
-      thing1: { name: 'Thing1', price: 1, imageUrl: 'assets/img/thing1.png' },
-      thing2: { name: 'Thing2', price: 2, imageUrl: 'assets/img/thing2.png' },
-      thing3: { name: 'Thing3', price: 3, imageUrl: 'assets/img/thing3.png' }
+      thing1: { name: 'Thing1', price: 1, size: 0.1, imageUrl: 'assets/img/thing1.png' },
+      thing2: { name: 'Thing2', price: 2, size: 0.1, imageUrl: 'assets/img/thing2.png' },
+      thing3: { name: 'Thing3', price: 3, size: 0.1, imageUrl: 'assets/img/thing3.png' }
     },
     inserted: {}
   };

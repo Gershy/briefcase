@@ -3,7 +3,10 @@
 The future of snacks is now.
 
 ## Instructions
-To run the server:
+To begin:
+Clone the repo and run `$ npm install`
+
+To run the server: 
 ```
 $ node briefcase.js [ --host <localhost|ip> ] [ --port <port #> ]
 ```

@@ -27,6 +27,16 @@
         87.5% { transform: scale(1.2) rotate(+3.1deg); }
         100%  { transform: scale(1.0) rotate(-3deg); text-shadow: 0 0 8px #700000; }
       }
+      @keyframes bounceDn {
+        0%    { transform: translate(0, 0); }
+        20%   { transform: translate(0, 35px); }
+        100%   { transform: translate(0, 0px); }
+      }
+      @keyframes bounceUp {
+        0%    { transform: translate(0, 0); }
+        20%   { transform: translate(0, -20px); }
+        100%   { transform: translate(0, 0px); }
+      }
       
       html, body {
         position: fixed;
@@ -37,12 +47,25 @@
         font-family: sans-serif;
         user-select: none;
       }
+      .logo {
+        position: absolute;
+        width: 400px; height: 140px; line-height: 140px;
+        left: 50%; top: 50%;
+        margin-left: -200px; margin-top: -300px;
+        background-image: url('assets/images/logo.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: 50% 50%;
+        transition: transform 200ms ease-in-out;
+      }
+      .logo.more { animation: bounceDn 350ms 1 ease-in-out; }
+      .logo.less { animation: bounceUp 600ms 1 ease-in-out; }
       .snackControl {
         position: absolute;
         width: 400px; height: 400px;
         left: 50%; top: 50%;
-        margin-left: -200px; margin-top: -200px;
-        box-shadow: 0 0 0 10px #000000;
+        margin-left: -200px; margin-top: -175px;
+        box-shadow: 0 0 0 8px #000000;
         background-color: #ffffff;
         z-index: 1;
       }
@@ -198,6 +221,8 @@
       
       let body = document.body;
       
+      let logoDom = body.appendChild(div('logo'));
+      
       let snackControl = body.appendChild(div('snackControl'));
       let availableDom = snackControl.appendChild(div('available'));
       let insertedDom = snackControl.appendChild(div('inserted'));
@@ -270,6 +295,8 @@
               let upd = await poll(`addInserted?${snackDom.snackId}`); // Do the add
               await update(upd);
               snackDom.classList.remove('waiting');
+              logoDom.classList.remove('less', 'more');
+              requestAnimationFrame(() => requestAnimationFrame(() => logoDom.classList.add('more')));
             });
             available[snackId] = { snackData, snackDom };
           }
@@ -309,6 +336,8 @@
               let upd = await poll(`remInserted?${snackDom.snackId}`); // Do the removal
               await update(upd);
               snackDom.classList.remove('waiting');
+              logoDom.classList.remove('less', 'more');
+              requestAnimationFrame(() => requestAnimationFrame(() => logoDom.classList.add('less')));
             });
             
             inserted[snackId] = { snackData, snackDom, count: 0 };
@@ -329,7 +358,7 @@
         
         statusDom.classList.remove('warning', 'critical', 'aughh');
         statusTextDom.innerText = '';
-        if (fullness > 2) {
+        if (fullness > 1.4) {
           statusDom.classList.add('aughh');
           statusTextDom.innerText = 'AUUGgHHuGG';
         } else if (fullness > 0.9) {

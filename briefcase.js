@@ -34,9 +34,9 @@ let router = {
     res.writeHead(200, { 'Content-Type': 'text/html' });
     fs.createReadStream(path.join(__dirname, 'simple.html')).pipe(res);
   },
-  'get /favicon': async (req, res) => {
-    res.writeHead(404, { 'Content-Type': 'text/plain' });
-    res.end('No favicon yet :(');
+  'get /favicon.ico': async (req, res) => {
+    res.writeHead(200, { 'Content-Type': 'image/x-icon' });
+    fs.createReadStream(path.join(__dirname, 'assets', 'favicon.ico')).pipe(res);
   },
   'get /assets': async (req, res) => {
     let pcs = req.url.split('/');

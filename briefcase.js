@@ -31,15 +31,35 @@ setInterval(() => fs.writeFile(statePath, JSON.stringify(data), ()=>{}), 10000);
 
 let router = {
   'get /': async (req, res) => {
+    let [ js, css ] = await Promise.all([
+      new Promise(r => fs.readFile(path.join(__dirname, 'client.js'), 'utf8', (e, c) => r(c))),
+      new Promise(r => fs.readFile(path.join(__dirname, 'client.css'), 'utf8', (e, c) => r(c)))
+    ]);
+    
     res.writeHead(200, { 'Content-Type': 'text/html' });
-    fs.createReadStream(path.join(__dirname, 'simple.html')).pipe(res);
+    res.end([
+      '<!DOCTYPE html>',
+      '<html>',
+      '<head>',
+      '<title>Briefcase!!</title>',
+      '<style rel="stylesheet" type="text/css">',
+      css.trim(),
+      '</style>',
+      '<script type="text/javascript">',
+      js.trim(),
+      '</script>',
+      '</head>',
+      '<body>',
+      '</body>',
+      '</html>'
+    ].join('\n'));
   },
   'get /favicon.ico': async (req, res) => {
     res.writeHead(200, { 'Content-Type': 'image/x-icon' });
     fs.createReadStream(path.join(__dirname, 'assets', 'favicon.ico')).pipe(res);
   },
   'get /assets': async (req, res) => {
-    let pcs = req.url.split('/');
+    let pcs = req.url.replace(/\.+/g, '.').split('/'); // Sequences of dots are replaced with a single dot
     if (pcs[pcs.length - 1].indexOf('.') === -1) throw new Error(`Invalid path: ${req.url}`);
 
     lastPc = pcs[pcs.length - 1].split('.');

@@ -1,0 +1,207 @@
+@keyframes wobbly {
+  10% { transform: rotate(4deg); }
+  30% { transform: rotate(-4deg); }
+  60% { transform: rotate(6deg); }
+  70% { transform: rotate(-3deg); }
+  85% { transform: rotate(3deg); }
+  100% { transform: rotate(-6deg); }
+}
+@keyframes shake {
+  0% { transform: scale(1); text-shadow: 0 0 0px #ff0000; }
+  50% { transform: scale(1.25); text-shadow: 0 0 8px #ff0000; }
+}
+@keyframes shake2 {
+  0%    { transform: scale(1.0) rotate(-3.0deg); text-shadow: 0 0 8px #700000; }
+  12.5% { transform: scale(1.2) rotate(+3.3deg); }
+  25%   { transform: scale(1.4) rotate(-3.2deg); }
+  37.5% { transform: scale(1.6) rotate(+2.0deg); }
+  50%   { transform: scale(1.8) rotate(-2.1deg); text-shadow: 0 0 16px #ff0000; }
+  62.5% { transform: scale(1.6) rotate(+3.5deg); }
+  75%   { transform: scale(1.4) rotate(-3.0deg); }
+  87.5% { transform: scale(1.2) rotate(+3.1deg); }
+  100%  { transform: scale(1.0) rotate(-3.0deg); text-shadow: 0 0 8px #700000; }
+}
+@keyframes shake3 {
+  0%    { transform: translate(0, 0)     scale(1.0)  rotate(+0.0deg); text-shadow: 0 0 8px #ff0000; }
+  25%   { transform: translate(0, -50px) scale(2.0)  rotate(+4.0deg); text-shadow: 0 0 8px #ff0000; }
+  50%   { transform: translate(0, 0)     scale(1.0)  rotate(+0.0deg); text-shadow: 0 0 8px #ff0000; }
+  75%   { transform: translate(0, -50px) scale(2.0)  rotate(-4.0deg); text-shadow: 0 0 8px #ff0000; }
+  100%  { transform: translate(0, 0)     scale(1.0)  rotate(+0.0deg); text-shadow: 0 0 8px #ff0000; }
+}
+@keyframes shake4 {
+  0% {   left: 4px;   top: -5px;  }
+  25% {  left: 2px;   top: 5px;   }
+  50% {  left: -5px;  top: -7px;  }
+  75% {  left: 7px;   top: 7px;   }
+  100% { left: 4px;   top: -5px;  }
+}
+@keyframes bounceDn {
+  0%    { transform: translate(0, 0); }
+  20%   { transform: translate(0, 35px); }
+  100%   { transform: translate(0, 0px); }
+}
+@keyframes bounceUp {
+  0%    { transform: translate(0, 0); }
+  20%   { transform: translate(0, -20px); }
+  100%   { transform: translate(0, 0px); }
+}
+
+html, body {
+  position: fixed;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  margin: 0; padding: 0;
+  background-color: #a8a8a8;
+  font-family: sans-serif;
+  user-select: none;
+}
+.logo {
+  position: absolute;
+  width: 400px; height: 140px; line-height: 140px;
+  left: 50%; top: 50%;
+  margin-left: -200px; margin-top: -300px;
+  background-image: url('assets/images/logo.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  transition: transform 200ms ease-in-out;
+}
+.logo.more { animation: bounceDn 350ms 1 ease-in-out; }
+.logo.less { animation: bounceUp 600ms 1 ease-in-out; }
+.snackControl {
+  position: absolute;
+  width: 400px; height: 400px;
+  left: 50%; top: 50%;
+  margin-left: -200px; margin-top: -175px;
+  box-shadow: 0 0 0 8px #000000;
+  background-color: #ffffff;
+  z-index: 1;
+}
+.snackControl > .loading {
+  position: absolute;
+  left: 0; top: 0;
+  width: 400px; height: 400px; line-height: 400px;
+  font-size: 24px;
+  text-align: center;
+  background-color: #ffffff;
+}
+.snackControl > .available, .snackControl > .inserted {
+  position: absolute;
+}
+.snackControl > .available {
+  width: 50%; height: 100%;
+  left: 0;
+}
+.snackControl > .inserted {
+  width: 50%; height: 100%;
+  right: 0;
+}
+.snack {
+  position: relative;
+  background-color: rgba(0, 0, 0, 0.3);
+  width: 100%; height: 30px; line-height: 30px;
+  text-align: center;
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  white-space: nowrap;
+  transition: opacity 1000ms ease-out;
+  opacity: 1;
+}
+.snack > .text {
+  position: absolute;
+  width: 100%; height: 30px; line-height: 30px;
+  color: #ffffff;
+  z-index: 2;
+}
+.snack.waiting {
+  opacity: 0.7;
+  pointer-events: none;
+  animation: wobbly 1000ms ease-in-out 400ms infinite;
+}
+.snack:before {
+  content: ''; display: block; position: absolute;
+  width: 300px; height: 300px;
+  left: -120px; top: 145px;
+  margin-left: -250px; margin-top: -250px;
+  transform: rotate(45deg);
+  background-color: #000000;
+  box-shadow: 0 0 20px 2px #000000;
+  transition: left 300ms ease-in-out;
+  z-index: 1;
+}
+.snack:hover:before { left: 150px; }
+.available > .snack:before { background-color: #00a010; box-shadow: 0 0 20px 2px #00a010; }
+.inserted > .snack:before { background-color: #c00000; box-shadow: 0 0 20px 2px #c00000; }
+
+.adminButton {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 4px; height: 4px;
+  background-color: #ffffff;
+}
+.admin {
+  position: absolute;
+  left: 100%; top: 100%;
+  width: 480px; height: 480px;
+  padding: 10px;
+  margin-left: -250px; margin-top: -250px;
+  transform: scale(0);
+  background-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 0 14px #000000;
+  pointer-events: none;
+  z-index: 2;
+  text-align: center;
+  
+  transition: left 600ms ease-in-out, top 600ms ease-in-out, transform 600ms linear;
+}
+.admin.open {
+  left: 50%; top: 50%;
+  transform: scale(1);
+  pointer-events: all;
+  font-size: 0;
+}
+.admin > .availableContent {
+  width: 472px; height: 400px;
+  padding: 4px;
+  resize: none;
+  outline: none !important;
+  border: none !important;
+  background-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.8);
+  font-size: 14px;
+}
+.admin > .button {
+  position: relative;
+  width: 200px; height: 60px; line-height: 60px;
+  font-size: 30px;
+  margin: 10px auto 0;
+  background-color: #102070;
+  color: #ffffff;
+  cursor: pointer;
+}
+.status {
+  position: absolute;
+  left: 0; bottom: 0;
+  width: 100%; height: 80px; line-height: 80px;
+  font-size: 30px;
+  text-align: center;
+  color: #000000;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.status > .text {
+  position: relative;
+  display: inline-block;
+  left: 0; top: 0;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.status.warning { background-color: rgba(120, 70, 40, 0.4); }
+.status.warning > .text { color: #ff6800; font-size: 30px; }
+.status.critical { background-color: rgba(255, 100, 100, 0.4); }
+.status.critical > .text { color: #ff0000; font-size: 40px; animation: shake 1000ms infinite linear; }
+.status.aughh { background-color: rgba(120, 0, 0, 0.6); }
+.status.aughh > .text { color: #700000; font-size: 60px; animation: shake2 1400ms infinite linear; }
+.status.apocalyptic { background-color: rgba(80, 0, 0, 0.7); box-shadow: 0 0 100px 100px rgba(80, 0, 0, 0.7); }
+.status.apocalyptic > .text { color: #900000; font-size: 70px; animation: shake3 3000ms infinite linear, shake4 160ms infinite linear; }

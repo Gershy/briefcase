@@ -74,7 +74,8 @@ let router = {
     let contentTypes = ({
       png: 'image/png',
       jpg: 'image/jpg',
-      jpeg: 'image/jpg'
+      jpeg: 'image/jpg',
+      gif: 'image/gif'
     });
     if (!contentTypes.hasOwnProperty(ext)) throw new Error(`Invalid path: ${req.url}`);
 

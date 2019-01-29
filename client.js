@@ -61,6 +61,8 @@ adminButtonDom.addEventListener('mousedown', () => {
 let statusDom = body.appendChild(div('status'));
 let statusTextDom = statusDom.appendChild(div('text'));
 
+let skullDom = body.appendChild(div('skull'));
+
 let available = {};
 let updateAvailable = upd => {
   /*
@@ -154,13 +156,18 @@ let updateInserted = (snackCounts) => {
     
   }
   
-  statusDom.classList.remove('warning', 'critical', 'aughh', 'apocalyptic');
+  statusDom.classList.remove('warning', 'critical', 'fatal', 'infernal', 'apocalyptic');
   statusTextDom.innerText = '';
-  if (fullness > 3) {
+  skullDom.classList.remove('open');
+  if (fullness > 5) {
     statusDom.classList.add('apocalyptic');
+    statusTextDom.innerText = 'RRRAHHHHHH';
+    skullDom.classList.add('open');
+  } else if (fullness > 3) {
+    statusDom.classList.add('infernal');
     statusTextDom.innerText = 'EEEUURRGHHHH';
   } else if (fullness > 1.4) {
-    statusDom.classList.add('aughh');
+    statusDom.classList.add('fatal');
     statusTextDom.innerText = 'AUUGgHHuGG';
   } else if (fullness > 0.9) {
     statusDom.classList.add('critical');

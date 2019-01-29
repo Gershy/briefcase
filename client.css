@@ -23,9 +23,9 @@
 }
 @keyframes shake3 {
   0%    { transform: translate(0, 0)     scale(1.0)  rotate(+0.0deg); text-shadow: 0 0 8px #ff0000; }
-  25%   { transform: translate(0, -50px) scale(2.0)  rotate(+4.0deg); text-shadow: 0 0 8px #ff0000; }
+  25%   { transform: translate(0, -50px) scale(2.0)  rotate(+4.0deg); text-shadow: 0 0 4px #ff0000; }
   50%   { transform: translate(0, 0)     scale(1.0)  rotate(+0.0deg); text-shadow: 0 0 8px #ff0000; }
-  75%   { transform: translate(0, -50px) scale(2.0)  rotate(-4.0deg); text-shadow: 0 0 8px #ff0000; }
+  75%   { transform: translate(0, -50px) scale(2.0)  rotate(-4.0deg); text-shadow: 0 0 4px #ff0000; }
   100%  { transform: translate(0, 0)     scale(1.0)  rotate(+0.0deg); text-shadow: 0 0 8px #ff0000; }
 }
 @keyframes shake4 {
@@ -34,6 +34,25 @@
   50% {  left: -5px;  top: -7px;  }
   75% {  left: 7px;   top: 7px;   }
   100% { left: 4px;   top: -5px;  }
+}
+@keyframes shake5 {
+  0%    { transform: translate(0, -40px)  scale(1.0)  rotate(+0.0deg);  text-shadow: 0 0 16px #800000; }
+  25%   { transform: translate(0, -140px) scale(2.0)  rotate(+4.5deg);  text-shadow: 0 0 8px  #800000; }
+  50%   { transform: translate(0, -20px)  scale(1.0)  rotate(+0.0deg);  text-shadow: 0 0 16px #ff0000; }
+  75%   { transform: translate(0, -140px) scale(2.0)  rotate(-4.5deg);  text-shadow: 0 0 8px  #800000; }
+  100%  { transform: translate(0, -40px)  scale(1.0)  rotate(+0.0deg);  text-shadow: 0 0 16px #800000; }
+}
+@keyframes shake6 {
+  0% {   left: 4px;   top: -5px;  }
+  25% {  left: 2px;   top: 5px;   }
+  50% {  left: -5px;  top: -7px;  }
+  75% {  left: 7px;   top: 7px;   }
+  100% { left: 4px;   top: -5px;  }
+}
+@keyframes pulse {
+  0% { transform: scale(1.6); }
+  50% { transform: scale(1.8); }
+  100% { transform: scale(1.6); }
 }
 @keyframes dipDown {
   0%    { transform: translate(0, 0); }
@@ -190,6 +209,7 @@ html, body {
   color: #000000;
   white-space: nowrap;
   pointer-events: none;
+  z-index: 3;
   
   transition: background-color 500ms linear, font-size 500ms linear, box-shadow 500ms linear;
 }
@@ -206,7 +226,34 @@ html, body {
 .status.warning > .text { color: #ff6800; font-size: 30px; }
 .status.critical { background-color: rgba(255, 100, 100, 0.4); }
 .status.critical > .text { color: #ff0000; font-size: 40px; animation: shake 1000ms infinite linear; }
-.status.aughh { background-color: rgba(120, 0, 0, 0.6); }
-.status.aughh > .text { color: #700000; font-size: 60px; animation: shake2 1400ms infinite linear; }
-.status.apocalyptic { background-color: rgba(80, 0, 0, 0.7); box-shadow: 0 0 100px 100px rgba(80, 0, 0, 0.7); }
-.status.apocalyptic > .text { color: #900000; font-size: 70px; animation: shake3 3000ms infinite linear, shake4 160ms infinite linear; }
+.status.fatal { background-color: rgba(120, 0, 0, 0.6); }
+.status.fatal > .text { color: #700000; font-size: 60px; animation: shake2 1400ms infinite linear; }
+.status.infernal { background-color: rgba(80, 0, 0, 0.7); box-shadow: 0 0 100px 100px rgba(80, 0, 0, 0.7); }
+.status.infernal > .text { color: #900000; font-size: 70px; animation: shake3 3000ms infinite linear, shake4 160ms infinite linear; }
+.status.apocalyptic { background-color: rgba(80, 0, 0, 0.7); box-shadow: 0 0 200px 200px rgba(80, 0, 0, 0.7); }
+.status.apocalyptic > .text { color: #400000; font-size: 80px; animation: shake5 4000ms infinite linear, shake6 100ms infinite linear; }
+
+.skull {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 500px; height: 800px;
+  margin-left: -250px; margin-top: -400px;
+  outline: 1px solid black;
+  z-index: 10;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  
+  background-image: url(assets/images/skull.gif);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: 15px -157px;
+  
+          mask-image: radial-gradient(rgba(0, 0, 0, 1), rgba(255, 255, 255, 1));
+  -webkit-mask-image: radial-gradient(rgba(0, 0, 0, 0.6) 0%, rgba(255, 255, 255, 0) 60%, rgba(255, 255, 255, 0));
+  
+  animation: pulse 10000ms infinite ease-in-out;
+  
+  transition: opacity 500ms linear, visibility 0ms 500ms;
+}
+.skull.open { visibility: visible; opacity: 1; transition: opacity 8000ms linear, visibility 0ms 0ms; }

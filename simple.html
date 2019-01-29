@@ -17,8 +17,15 @@
         50% { transform: scale(1.33); text-shadow: 0 0 8px #ff0000; }
       }
       @keyframes shake2 {
-        0% { transform: scale(1); text-shadow: 0 0 8px #700000; }
-        50% { transform: scale(1.8); text-shadow: 0 0 16px #ff0000; }
+        0%    { transform: scale(1.0) rotate(-3deg); text-shadow: 0 0 8px #700000; }
+        12.5% { transform: scale(1.2) rotate(+3.3deg); }
+        25%   { transform: scale(1.4) rotate(-3.2deg); }
+        37.5% { transform: scale(1.6) rotate(+2deg); }
+        50%   { transform: scale(1.8) rotate(-2.1deg); text-shadow: 0 0 16px #ff0000; }
+        62.5% { transform: scale(1.6) rotate(+3.5deg); }
+        75%   { transform: scale(1.4) rotate(-3deg); }
+        87.5% { transform: scale(1.2) rotate(+3.1deg); }
+        100%  { transform: scale(1.0) rotate(-3deg); text-shadow: 0 0 8px #700000; }
       }
       
       html, body {
@@ -154,6 +161,7 @@
         text-align: center;
         color: #000000;
         white-space: nowrap;
+        pointer-events: none;
       }
       .status > .text {
         position: relative;
@@ -323,7 +331,7 @@
         statusTextDom.innerText = '';
         if (fullness > 2) {
           statusDom.classList.add('aughh');
-          statusTextDom.innerText = 'AUUuGGHHuGHGG';
+          statusTextDom.innerText = 'AUUGgHHuGG';
         } else if (fullness > 0.9) {
           statusDom.classList.add('critical');
           statusTextDom.innerText = 'Warning: briefcase is VERY full!';

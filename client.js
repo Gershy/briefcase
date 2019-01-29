@@ -120,6 +120,7 @@ let updateInserted = (snackCounts) => {
     }
   }
   
+  let fullness = 0;
   for (let [ snackId, count ] of Object.entries(snackCounts)) {
     
     // Get data
@@ -149,13 +150,8 @@ let updateInserted = (snackCounts) => {
     // Update count and dom
     inserted[snackId].count = count;
     inserted[snackId].snackDom.getElementsByClassName('text')[0].innerText = `${snackData.name} (x ${count})`;
-    
-  }
-  
-  let fullness = 0;
-  for (let [ snackId, snackIns ] of Object.entries(inserted)) {
-    let { snackData, count } = snackIns;
     fullness += count * (snackData.hasOwnProperty('size') ? snackData.size : 0.1);
+    
   }
   
   statusDom.classList.remove('warning', 'critical', 'aughh', 'apocalyptic');

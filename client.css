@@ -189,6 +189,8 @@ html, body {
   color: #000000;
   white-space: nowrap;
   pointer-events: none;
+  
+  transition: background-color 500ms linear, font-size 500ms linear, box-shadow 500ms linear;
 }
 .status > .text {
   position: relative;
@@ -196,6 +198,8 @@ html, body {
   left: 0; top: 0;
   vertical-align: middle;
   white-space: nowrap;
+  
+  transition: colour 500ms linear, font-size 500ms linear, text-shadow 500ms linear;
 }
 .status.warning { background-color: rgba(120, 70, 40, 0.4); }
 .status.warning > .text { color: #ff6800; font-size: 30px; }

@@ -5,7 +5,7 @@ The future of snacks is now.
 ## Instructions
 To run the server:
 ```
-$ node briefcase.js [ --host <"localhost"|ip> ] [ --port <port #> ]
+$ node briefcase.js [ --host <localhost|ip> ] [ --port <port #> ]
 ```
 
 For local testing @ port 80 use:
